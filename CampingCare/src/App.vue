@@ -1,8 +1,22 @@
 <script setup lang="ts">
-import { RouterLink, RouterView, useRoute } from 'vue-router'
+import { RouterLink, RouterView } from 'vue-router'
 import HelloWorld from './components/HelloWorld.vue'
-const route = useRoute()
-console.log(route.query)
+import { onMounted } from 'vue'
+import { useAuthStore } from './services/CampingConnection.ts'
+
+const authStore = useAuthStore()
+
+onMounted(() => {
+  const query = new URLSearchParams(window.location.search)
+
+  if (query.has('authtoken') && query.has('admin_id')) {
+    const token = query.get('authtoken')
+    //console.log('Mounted', token)
+    authStore.initializeApp(token)
+  } else {
+    console.warn('Authorization token not found in URL search params')
+  }
+})
 </script>
 
 <template>
