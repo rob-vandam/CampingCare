@@ -17,7 +17,7 @@ export const useAuthStore = defineStore('auth', {
           this.accessToken = response.data.idToken
           this.refreshToken = response.data.refreshToken
           this.admin_id = admin_id
-          console.log('Tokendata:', response.data.idToken)
+          //console.log('Tokendata:', response.data.idToken)
         } catch (error) {
           console.error('Kan tokens niet ophalen:', error)
         }
@@ -26,22 +26,54 @@ export const useAuthStore = defineStore('auth', {
   },
 })
 
-export const getReservations = async () => {
-  const authStore = useAuthStore()
-  const token = authStore.accessToken
-  console.log('ReservationsToken:', token)
-  const admin_id = authStore.admin_id
-  const config = {
-    headers: {
-      Accept: 'application/json, text/plain, */*',
-      Authorization: `Bearer ${token}`,
-      'x-Admin-Id': `${admin_id}`,
-    },
-  }
-  axios.interceptors.request.use((config) => {
-    console.log('Request Headers:', config.headers)
+axios.interceptors.request.use(
+  (config) => {
+    const authStore = useAuthStore()
+    const token = authStore.accessToken
+    const admin_id = authStore.admin_id
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`
+      config.headers['x-Admin-Id'] = `${admin_id}`
+    }
     return config
-  })
-  const request = axios.get(`${endpoint}/reservations`, config)
+  },
+  (error) => {
+    return Promise.reject(error)
+  },
+)
+
+axios.interceptors.response.use(
+  (response) => {
+    return response
+  },
+  (error) => {
+    const originalRequest = error.config
+
+    if (error.response.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true
+      const authStore = useAuthStore()
+      const refreshToken = authStore.refreshToken
+      return axios
+        .post(`${endpoint}/oauth/refresh_token`, { auth_token: refreshToken })
+        .then((response) => {
+          authStore.accessToken = response.data.idToken
+          authStore.refreshToken = response.data.refreshToken
+
+          originalRequest.headers.Authorization = `Bearer ${response.data.idToken}`
+          return axios(originalRequest)
+        })
+        .catch((refreshError) => {
+          console.error('Error refreshing token:', refreshError)
+
+          return Promise.reject(error)
+        })
+    }
+
+    return Promise.reject(error)
+  },
+)
+
+export const getReservations = async () => {
+  const request = axios.get(`${endpoint}/reservations`)
   return request.then((response) => response.data)
 }

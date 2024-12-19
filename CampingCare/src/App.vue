@@ -1,17 +1,24 @@
 <script setup lang="ts">
-import { RouterLink, RouterView } from 'vue-router'
-import HelloWorld from './components/HelloWorld.vue'
-import { onMounted, watchEffect } from 'vue'
+//import { RouterLink, RouterView } from 'vue-router'
+import { onMounted, watchEffect, ref } from 'vue'
 import { useAuthStore, getReservations } from './services/CampingConnection.ts'
 
 const authStore = useAuthStore()
+interface Reservation {
+  id: number
+  arrival: string
+  departure: string
+}
 
-watchEffect(() => {
+const reservations = ref<Reservation[]>([])
+
+watchEffect(async () => {
   const token = authStore.accessToken
   const adminId = authStore.admin_id
 
   if (token && adminId) {
-    const reservations = getReservations()
+    const getRes = await getReservations()
+    reservations.value = getRes
     console.log('Reservations:', reservations)
   }
 })
@@ -31,82 +38,12 @@ onMounted(() => {
 </script>
 
 <template>
-  <header>
-    <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
-
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
-
-      <nav>
-        <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/about">About</RouterLink>
-      </nav>
-    </div>
-  </header>
-
-  <RouterView />
+  <ul>
+    <li v-for="(item, index) in reservations" v-bind:key="index">
+      ID: {{ item.id }} - Aankomst: {{ item.arrival.substring(0, 10) }} - Vertrek:
+      {{ item.departure.substring(0, 10) }}
+    </li>
+  </ul>
 </template>
 
-<style scoped>
-header {
-  line-height: 1.5;
-  max-height: 100vh;
-}
-
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
-}
-
-nav {
-  width: 100%;
-  font-size: 12px;
-  text-align: center;
-  margin-top: 2rem;
-}
-
-nav a.router-link-exact-active {
-  color: var(--color-text);
-}
-
-nav a.router-link-exact-active:hover {
-  background-color: transparent;
-}
-
-nav a {
-  display: inline-block;
-  padding: 0 1rem;
-  border-left: 1px solid var(--color-border);
-}
-
-nav a:first-of-type {
-  border: 0;
-}
-
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
-
-  .logo {
-    margin: 0 2rem 0 0;
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
-
-  nav {
-    text-align: left;
-    margin-left: -1rem;
-    font-size: 1rem;
-
-    padding: 1rem 0;
-    margin-top: 1rem;
-  }
-}
-</style>
+<style scoped></style>
