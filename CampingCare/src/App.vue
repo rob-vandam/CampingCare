@@ -1,10 +1,20 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from 'vue-router'
 import HelloWorld from './components/HelloWorld.vue'
-import { onMounted } from 'vue'
-import { useAuthStore } from './services/CampingConnection.ts'
+import { onMounted, watchEffect } from 'vue'
+import { useAuthStore, getReservations } from './services/CampingConnection.ts'
 
 const authStore = useAuthStore()
+
+watchEffect(() => {
+  const token = authStore.accessToken
+  const adminId = authStore.admin_id
+
+  if (token && adminId) {
+    const reservations = getReservations()
+    console.log('Reservations:', reservations)
+  }
+})
 
 onMounted(() => {
   const query = new URLSearchParams(window.location.search)

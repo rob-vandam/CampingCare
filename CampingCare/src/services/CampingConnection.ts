@@ -25,3 +25,23 @@ export const useAuthStore = defineStore('auth', {
     },
   },
 })
+
+export const getReservations = async () => {
+  const authStore = useAuthStore()
+  const token = authStore.accessToken
+  console.log('ReservationsToken:', token)
+  const admin_id = authStore.admin_id
+  const config = {
+    headers: {
+      Accept: 'application/json, text/plain, */*',
+      Authorization: `Bearer ${token}`,
+      'x-Admin-Id': `${admin_id}`,
+    },
+  }
+  axios.interceptors.request.use((config) => {
+    console.log('Request Headers:', config.headers)
+    return config
+  })
+  const request = axios.get(`${endpoint}/reservations`, config)
+  return request.then((response) => response.data)
+}

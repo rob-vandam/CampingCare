@@ -14,10 +14,7 @@
   },
   "dependencies": {
     "axios": "^1.7.9",
-<<<<<<< HEAD
     "pinia": "^2.3.0",
-=======
->>>>>>> 7c83cc97b161bf0e8927dc3b615fa7ec828b949b
     "vue": "^3.5.13",
     "vue-router": "^4.4.5"
   },
