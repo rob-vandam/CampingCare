@@ -12,6 +12,12 @@ interface Reservation {
 
 const reservations = ref<Reservation[]>([])
 
+const refreshRes = async () => {
+  //console.log('CLICKED')
+  const getRes = await getReservations()
+  reservations.value = getRes
+}
+
 watchEffect(async () => {
   const token = authStore.accessToken
   const adminId = authStore.admin_id
@@ -44,6 +50,8 @@ onMounted(() => {
       {{ item.departure.substring(0, 10) }}
     </li>
   </ul>
+  <br />
+  <button @click="refreshRes">Refresh</button>
 </template>
 
 <style scoped></style>
