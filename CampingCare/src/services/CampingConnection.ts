@@ -48,13 +48,8 @@ axios.interceptors.response.use(
   },
   async (error) => {
     const originalRequest = error.config
-    //let retryCount = originalRequest._retry || 0
-    //console.log(retryCount)
     if (error.response.status === 400 && !originalRequest._retry) {
       originalRequest._retry = true
-      //retryCount++
-      //const newRequest = { ...originalRequest }
-      //newRequest._retry = retryCount
       const authStore = useAuthStore()
       const refreshToken = authStore.refreshToken
 
