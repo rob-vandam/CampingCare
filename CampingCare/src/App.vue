@@ -58,7 +58,6 @@ onMounted(() => {
   if (query.has('authtoken') && query.has('admin_id')) {
     const token = query.get('authtoken')
     const admin_id = query.get('admin_id')
-    //console.log('Mounted', token)
     authStore.initializeApp(token, admin_id)
   } else {
     console.warn('Authorization token not found in URL search params')
