@@ -4,10 +4,16 @@ import { onMounted, watchEffect, ref } from 'vue'
 import { useAuthStore, getReservations } from './services/CampingConnection.ts'
 
 const authStore = useAuthStore()
+
+interface Contact {
+  name: string;
+}
+
 interface Reservation {
-  id: number
-  arrival: string
-  departure: string
+  id: string;
+  contact: Contact;
+  arrival: string;
+  departure: string;
 }
 
 const reservations = ref<Reservation[]>([])
@@ -46,7 +52,7 @@ onMounted(() => {
 <template>
   <ul>
     <li v-for="(item, index) in reservations" v-bind:key="index">
-      ID: {{ item.id }} - Aankomst: {{ item.arrival.substring(0, 10) }} - Vertrek:
+      Name: {{ item.contact.name }} ID: {{ item.id }} - Aankomst: {{ item.arrival.substring(0, 10) }} - Vertrek:
       {{ item.departure.substring(0, 10) }}
     </li>
   </ul>

@@ -74,6 +74,6 @@ axios.interceptors.response.use(
 )
 
 export const getReservations = async () => {
-  const request = axios.get(`${endpoint}/reservations`)
+  const request = axios.get(`${endpoint}/reservations?get_contact=true`)
   return request.then((response) => response.data)
 }
