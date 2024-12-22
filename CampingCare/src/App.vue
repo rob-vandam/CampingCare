@@ -2,6 +2,16 @@
 //import { RouterLink, RouterView } from 'vue-router'
 import { onMounted, watchEffect, ref } from 'vue'
 import { useAuthStore, getReservations } from './services/CampingConnection.ts'
+import VueDatePicker from '@vuepic/vue-datepicker'
+import '@vuepic/vue-datepicker/dist/main.css'
+//const date = ref(new Date())
+const date = ref<string | null>(null)
+
+const applyDate = () => {
+  console.log("Date applied:", date.value)
+
+  }
+
 
 const authStore = useAuthStore()
 
@@ -51,6 +61,9 @@ onMounted(() => {
 
 <template>
   <ul>
+    <VueDatePicker v-model="date" format="dd-MM-yyyy" auto-apply @update:modelValue="applyDate">
+      <p v-if="date">Selected date: {{ date }}</p>
+    </VueDatePicker>
     <li v-for="(item, index) in reservations" v-bind:key="index">
       Name: {{ item.contact.name }} ID: {{ item.id }} - Aankomst: {{ item.arrival.substring(0, 10) }} - Vertrek:
       {{ item.departure.substring(0, 10) }}
