@@ -73,7 +73,12 @@ axios.interceptors.response.use(
   },
 )
 
-export const getReservations = async () => {
-  const request = axios.get(`${endpoint}/reservations?get_contact=true`)
+export const getReservations = async (arrival_date = '') => {
+  const urlParams = new URLSearchParams({
+    get_contact: true.toString(),
+    arrival: arrival_date,
+  })
+
+  const request = axios.get(`${endpoint}/reservations?${urlParams.toString()}`)
   return request.then((response) => response.data)
 }

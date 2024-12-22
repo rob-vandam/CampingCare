@@ -4,12 +4,19 @@ import { onMounted, watchEffect, ref } from 'vue'
 import { useAuthStore, getReservations } from './services/CampingConnection.ts'
 import VueDatePicker from '@vuepic/vue-datepicker'
 import '@vuepic/vue-datepicker/dist/main.css'
-//const date = ref(new Date())
+import { format } from 'date-fns'
 const date = ref<string | null>(null)
 
-const applyDate = () => {
-  console.log("Date applied:", date.value)
-
+const applyDate = async () => {
+  if (!date.value) {
+    console.error('Invalid date')
+    return
+  }
+  const selectedDate = new Date(date.value) // || undefined
+  const formattedDate = format(selectedDate, 'yyyy-MM-dd')
+  console.log("Date applied:", formattedDate)
+  const getRes = await getReservations(formattedDate)
+  reservations.value = getRes
   }
 
 
@@ -29,9 +36,9 @@ interface Reservation {
 const reservations = ref<Reservation[]>([])
 
 const refreshRes = async () => {
-  //console.log('CLICKED')
   const getRes = await getReservations()
   reservations.value = getRes
+  date.value = null
 }
 
 watchEffect(async () => {
@@ -61,6 +68,7 @@ onMounted(() => {
 
 <template>
   <ul>
+    <p>Select arrival date</p>
     <VueDatePicker v-model="date" format="dd-MM-yyyy" auto-apply @update:modelValue="applyDate">
       <p v-if="date">Selected date: {{ date }}</p>
     </VueDatePicker>
